@@ -1,0 +1,13 @@
+update_system
+gui_install
+basic_install
+java_install
+awesome_vim
+ohmyzsh_setup
+nodejs_install
+gcc_install
+miniconda_install
+apache_install
+mariadb_install
+php_install
+wordpress_install

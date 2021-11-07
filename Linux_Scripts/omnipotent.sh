@@ -2,28 +2,6 @@
 
 . ./colors.sh
 
-function run_checks()
-{
-    # Check if all inputs from user are positive integers.
-    all_positive_integers_in_array "${user_options[@]}"
-    # YES res1 -> 0
-    # NO res1 -> 1
-    res1=$?
-
-    # Check if all user inputs are in correct range of options.
-    is_option_in_range ${user_options[@]}
-    # YES res2 -> 0
-    # NO res2 -> 1
-    res2=$?
-
-    # Check if user wants to install all packages, without choosing any others.
-    # So returns 0 only when, the user chose 14.
-    only_all ${user_options[@]}
-    # YES res3 -> 0
-    # NO res3 -> 1
-    res3=$?
-}
-
 function main()
 {
     echo "Inside main function in omnipotent.sh"
@@ -70,6 +48,28 @@ function main()
         echo -e "${red}NOK${no_color}"
         # Abort the process.
     fi
+}
+
+function run_checks()
+{
+    # Check if all inputs from user are positive integers.
+    all_positive_integers_in_array "${user_options[@]}"
+    # YES res1 -> 0
+    # NO res1 -> 1
+    res1=$?
+
+    # Check if all user inputs are in correct range of options.
+    is_option_in_range ${user_options[@]}
+    # YES res2 -> 0
+    # NO res2 -> 1
+    res2=$?
+
+    # Check if user wants to install all packages, without choosing any others.
+    # So returns 0 only when, the user chose 14.
+    only_all ${user_options[@]}
+    # YES res3 -> 0
+    # NO res3 -> 1
+    res3=$?
 }
 
 function update_system()
@@ -309,10 +309,18 @@ function mariadb_install()
     if [ ! -f /mariadb_installed ]
     then
         # Install MariaDB Server.
-        wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
-        chmod +x mariadb_repo_setup
-        sudo ./mariadb_repo_setup
-        sudo yum install MariaDB-server -y
+        #wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+        curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+        sleep 5
+        #chmod +x mariadb_repo_setup
+        sudo bash mariadb_repo_setup --mariadb-server-version=10.6
+        sudo sed -i 's/gpgcheck = 1/gpgcheck = 0/g' /etc/yum.repos.d/mariadb.repo
+        sleep 5
+        #sudo ./mariadb_repo_setup
+        sudo yum install MariaDB-server MariaDB-client MariaDB-backup -y
+        sleep 5
+        #sudo yum install MariaDB-server -y
+        sleep 5
         sudo systemctl enable mariadb.service
         sudo systemctl start mariadb.service
         sudo rm ./mariadb_repo_setup

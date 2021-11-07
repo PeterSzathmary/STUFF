@@ -33,7 +33,7 @@ function main()
             else
                 echo -e "${green}Everything is going to be installed...${no_color}"
                 sleep 2
-                eval $all_install
+                all_install
             fi
         done
 
@@ -448,7 +448,7 @@ function all_install()
     awesome_vim
     ohmyzsh_setup
     nodejs_install
-    gcc_install
+    #gcc_install
     miniconda_install
     apache_install
     mariadb_install

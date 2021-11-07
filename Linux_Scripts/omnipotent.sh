@@ -2,28 +2,74 @@
 
 . ./colors.sh
 
+function run_checks()
+{
+    # Check if all inputs from user are positive integers.
+    all_positive_integers_in_array "${user_options[@]}"
+    # YES res1 -> 0
+    # NO res1 -> 1
+    res1=$?
+
+    # Check if all user inputs are in correct range of options.
+    is_option_in_range ${user_options[@]}
+    # YES res2 -> 0
+    # NO res2 -> 1
+    res2=$?
+
+    # Check if user wants to install all packages, without choosing any others.
+    # So returns 0 only when, the user chose 14.
+    only_all ${user_options[@]}
+    # YES res3 -> 0
+    # NO res3 -> 1
+    res3=$?
+}
+
 function main()
 {
-    update_system
-    gui_install
-    basic_install
-    java_install
-    awesome_vim
-    ohmyzsh_setup
-    nodejs_install
-    # gcc_install
-    miniconda_install
-    apache_install
-    mariadb_install
-    php_install
-    wordpress_install
+    echo "Inside main function in omnipotent.sh"
+    . ./menu.sh
 
-    # TODO:
-    # check_installation_status
+    run_checks
 
-    echo "Press ANY key to reboot..."
-    read
-    sudo reboot +0
+    user_options=( "${user_options[@]}" )
+    options=( "${options[@]}" )
+
+    # 1. All user's options have to be less than all available options.
+    # 2. All user's options have to be positive integers.
+    # 3. All user's options have to be in range.
+    # OR
+    # 4. User's only choice was downloading all.
+    if [[ ${#user_options[@]} -lt $((${#options[@]}+1)) && $res1 -eq 0 && $res2 -eq 0 ]] || [[ $res3 -eq 0 ]]
+    then
+        echo -e "${green}OK${no_color}"
+        # Install selected "packages."
+        # Loop through the options the user has choosed and print them.
+        for i in "${arr[@]}"
+        do
+            if [[ $i -ne 14  ]]
+            then
+                echo -e "Installing -> ${green}${options[$((i-1))]}${no_color}"
+                sleep 1
+                # Call funtction the user has choosed.
+                eval ${options[$((i-1))]}
+            else
+                echo -e "${green}Everything is going to be installed...${no_color}"
+                sleep 2
+                eval $all_install
+            fi
+        done
+
+        # TODO:
+        # check_installation_status
+
+        echo "All is done!"
+        echo "Press ANY key to reboot..."
+        read
+        sudo reboot +0
+    else
+        echo -e "${red}NOK${no_color}"
+        # Abort the process.
+    fi
 }
 
 function update_system()
@@ -53,7 +99,7 @@ function gui_install()
 
         echo "GUI has been installed successfully!"
     else
-        echo "GUI is already installed!"
+        echo -e "${yellow}GUI is already installed...${no_color}"
     fi
 }
 
@@ -76,6 +122,8 @@ function java_install()
         sudo update-alternatives --set javac java-latest-openjdk.x86_64
 
         sudo touch /java_installed
+    else
+        echo -e "${yellow}Java is already installed...${no_color}"
     fi
 }
 
@@ -106,6 +154,8 @@ function awesome_vim()
         done
 
         sudo touch /awesome_vim_installed
+    else
+        echo -e "${yellow}Awesome Vim is already installed...${no_color}"
     fi
 }
 
@@ -118,6 +168,8 @@ function nodejs_install()
         sudo yum install -y nodejs
 
         sudo touch /nodejs_installed
+    else
+        echo -e "${yellow}NodeJS is already installed...${no_color}"
     fi
 }
 
@@ -184,6 +236,8 @@ function ohmyzsh_setup()
 
         # Create flag file that we have configured oh-my-zsh in our system.
         sudo touch /ohmyzsh_installed
+    else
+        echo -e "${yellow}OhMyZsh is already installed...${no_color}"
     fi
 }
 
@@ -211,6 +265,8 @@ function gcc_install()
         rm -rf gcc-build
 
         sudo touch /gcc_installed
+    else
+        echo -e "${yellow}GCC is already installed...${no_color}"
     fi
 }
 
@@ -224,6 +280,8 @@ function miniconda_install()
         cd ~/miniconda3/bin && ./conda update conda -y && ./conda update --all -y && ./conda init zsh
         
         sudo touch /miniconda_installed
+    else
+        echo -e "${yellow}Miniconda is already installed...${no_color}"
     fi
 }
 
@@ -241,6 +299,8 @@ function apache_install()
         sudo systemctl start http.service
 
         sudo touch /apache_installed
+    else
+        echo -e "${yellow}Apache is already installed...${no_color}"
     fi
 }
 
@@ -289,6 +349,8 @@ function mariadb_install()
         sudo mariadb -u "root" -p"$root_password" -e "FLUSH PRIVILEGES;"
 
         sudo touch /mariadb_installed
+    else
+        echo -e "${yellow}MariaDB is already installed...${no_color}"
     fi
 }
 
@@ -301,21 +363,36 @@ function php_install()
 
         sudo ln -s /opt/rh/rh-php72/root/usr/bin/php /usr/bin/php
 
+        if [ -f /apache_installed ] && [ ! -f /php_softlinks_configured ]
+        then
+            sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
+            sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
+            sudo ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
+
+            sudo systemctl restart httpd
+
+            sudo touch /php_softlinks_configured
+        else
+            echo "Soft links were already created for php in /etc/httpd/{conf.d,conf.modules.d,modules}"
+        fi
+
         sudo touch /php_installed
-    fi
-
-    if [ -f /apache_installed ] && [ ! -f /php_softlinks_configured ]
-    then
-        sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
-        sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
-        sudo ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
-
-        sudo systemctl restart httpd
-
-        sudo touch /php_softlinks_configured
     else
-        echo "Soft links were already created for php in /etc/httpd/{conf.d,conf.modules.d,modules}"
+        echo -e "${yellow}PHP is already installed...${no_color}"
     fi
+
+    # if [ -f /apache_installed ] && [ ! -f /php_softlinks_configured ]
+    # then
+    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
+    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
+    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
+
+    #     sudo systemctl restart httpd
+
+    #     sudo touch /php_softlinks_configured
+    # else
+    #     echo "Soft links were already created for php in /etc/httpd/{conf.d,conf.modules.d,modules}"
+    # fi
 }
 
 function wordpress_install()
@@ -349,7 +426,26 @@ function wordpress_install()
             #firefox http://$(hostname)
             :
         fi
+    else
+        echo -e "${yellow}Wordpress is already installed...${no_color}"
     fi
+}
+
+function all_install()
+{
+    update_system
+    gui_install
+    basic_install
+    java_install
+    awesome_vim
+    ohmyzsh_setup
+    nodejs_install
+    gcc_install
+    miniconda_install
+    apache_install
+    mariadb_install
+    php_install
+    wordpress_install
 }
 
 main

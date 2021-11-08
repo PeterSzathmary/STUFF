@@ -11,3 +11,4 @@ apache_install
 mariadb_install
 php_install
 wordpress_install
+ftp_install

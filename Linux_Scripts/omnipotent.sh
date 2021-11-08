@@ -24,7 +24,7 @@ function main()
         # Loop through the options the user has choosed and print them.
         for i in "${arr[@]}"
         do
-            if [[ $i -ne 14  ]]
+            if [[ $i -ne $((${#options[@]}+1))  ]]
             then
                 echo -e "Installing -> ${green}${options[$((i-1))]}${no_color}"
                 sleep 1
@@ -65,7 +65,7 @@ function run_checks()
     res2=$?
 
     # Check if user wants to install all packages, without choosing any others.
-    # So returns 0 only when, the user chose 14.
+    # So returns 0 only when, the user chose $((${#options[@]}+1)) which is length of all options + 1.
     only_all ${user_options[@]}
     # YES res3 -> 0
     # NO res3 -> 1
@@ -388,19 +388,6 @@ function php_install()
     else
         echo -e "${yellow}PHP is already installed...${no_color}"
     fi
-
-    # if [ -f /apache_installed ] && [ ! -f /php_softlinks_configured ]
-    # then
-    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.d/rh-php72-php.conf /etc/httpd/conf.d/
-    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/conf.modules.d/15-rh-php72-php.conf /etc/httpd/conf.modules.d/
-    #     sudo ln -s /opt/rh/httpd24/root/etc/httpd/modules/librh-php72-php7.so /etc/httpd/modules/
-
-    #     sudo systemctl restart httpd
-
-    #     sudo touch /php_softlinks_configured
-    # else
-    #     echo "Soft links were already created for php in /etc/httpd/{conf.d,conf.modules.d,modules}"
-    # fi
 }
 
 function wordpress_install()
@@ -439,6 +426,55 @@ function wordpress_install()
     fi
 }
 
+function ftp_install()
+{
+    if [ ! -f /ftp_installed ]
+    then
+        # Install FTP Service with VSFTPD.
+        sudo yum install ftp vsftpd -y
+        sudo systemctl start vsftpd.service
+        sudo systemctl enable vsftpd.service
+        sudo firewall-cmd --zone=public --permanent --add-port=21/tcp
+        sudo firewall-cmd --zone=public --permanent --add-service=ftp
+        sudo firewall-cmd --reload
+        
+        local dir=/etc/vsftpd/vsftpd.conf
+
+        # Configuring VSFTPD.
+        sudo cp $dir /etc/vsftpd/vsftpd.conf.default
+        sudo sed -i 's/anonymous_enable=YES/anonymous_enable=NO/g' $dir
+        sudo sed -i 's/#chroot_local_user=YES/chroot_local_user=YES/g' $dir
+        echo "allow_writeable_chroot=YES" >> $dir
+        echo "userlist_file=/etc/vsftpd/user_list" >> $dir
+        echo "userlist_deny=NO" >> $dir
+        sudo systemctl restart vsftpd
+
+        # Create a new FTP user.
+        echo -e -n "${light_cyan}Enter an username for FTP service: ${no_color}"
+        read ftp_user_name
+        useradd $ftp_user_name
+
+        echo -e -n "${light_cyan}Enter a password for FTP service: ${no_color}"
+        read -s ftp_user_password
+
+        echo "$ftp_user_name:$ftp_user_password" | chpasswd
+        # Add new user to the user_list.
+        echo "$ftp_user_name" | sudo tee -a /etc/vsftpd/user_list > /dev/null
+
+        sudo mkdir -p "/home/$ftp_user_name/ftp/upload"
+        sudo chmod 550 "/home/$ftp_user_name/ftp"
+        sudo chmod 750 "/home/$ftp_user_name/ftp/upload"
+        sudo chown -R $ftp_user_name: "/home/$ftp_user_name/ftp"
+
+        echo -e "${yellow}See this: https://www.johnyoung.tech/is-it-the-end-for-ftp/${no_color}"
+        sudo setsebool -P ftpd_full_access on
+        
+        sudo touch /ftp_installed
+    else
+        echo -e "${yellow}VSFTPD (ftp) is already installed...${no_color}"
+    fi
+}
+
 function all_install()
 {
     update_system
@@ -454,6 +490,7 @@ function all_install()
     mariadb_install
     php_install
     wordpress_install
+    ftp_install
 }
 
 main

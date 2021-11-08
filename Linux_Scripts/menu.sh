@@ -71,7 +71,7 @@
          # If the element is NOT in range, exit the function with code 1.
          if [[ $i -gt ${#options[@]} ]] || [[ $i -le 0 ]]
          then
-             if [[ $i -ne 14 ]]
+             if [[ $i -ne $((${#options[@]}+1)) ]]
              then
                  echo -e "${red}$i is not in range !!!${no_color}"
              fi
@@ -86,7 +86,7 @@
  function only_all()
  {
      arr=("$@")
-     if [[ ${arr[0]} -eq 14 && ${#arr[@]} -eq 1 ]]
+     if [[ ${arr[0]} -eq $((${#options[@]}+1)) && ${#arr[@]} -eq 1 ]]
      then
          return 0
      else

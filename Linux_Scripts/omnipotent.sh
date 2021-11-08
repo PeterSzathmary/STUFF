@@ -454,7 +454,7 @@ function ftp_install()
         read ftp_user_name
         useradd $ftp_user_name
 
-        echo -e -n "${light_cyan}Enter a password for FTP service: ${no_color}"
+        echo -e -n "${light_cyan}Enter a password for $ftp_user_name: ${no_color}"
         read -s ftp_user_password
 
         echo "$ftp_user_name:$ftp_user_password" | chpasswd
@@ -466,7 +466,8 @@ function ftp_install()
         sudo chmod 750 "/home/$ftp_user_name/ftp/upload"
         sudo chown -R $ftp_user_name: "/home/$ftp_user_name/ftp"
 
-        echo -e "${yellow}See this: https://www.johnyoung.tech/is-it-the-end-for-ftp/${no_color}"
+        echo -e "\n${yellow}See this: https://www.johnyoung.tech/is-it-the-end-for-ftp/${no_color}"
+        echo "Applying full access for ftpd to the system..."
         sudo setsebool -P ftpd_full_access on
         
         sudo touch /ftp_installed

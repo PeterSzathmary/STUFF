@@ -7,11 +7,11 @@
 
 function main()
 {
-    ###############################
-    #                             #
-    #          VARIABLES          #
-    #                             #
-    ###############################
+	###############################
+	#                             #
+	#          VARIABLES          #
+	#                             #
+	###############################
 
     # Day
     dd=$1
@@ -32,7 +32,7 @@ function main()
 
     if [[ $male_female == "Z" ]]
     then
-        mm=$(($mm+50))
+	    mm=$(($mm+50))
     fi
 
     # Year without leading zeroes. If there aren't any, this line will not do anything.
@@ -41,34 +41,48 @@ function main()
     i=1
     for j in {0000..9999..1}
     do
-        br="$rr$mm$dd$j"
+	    br="$rr$mm$dd$j"
 
-        if [[ $(($rr_w_l$mm$dd$j % 11)) -eq 0 ]]
-        then
-            echo "br: $rr$mm$dd/$j"
-        fi
+	    if [[ $(($rr_w_l$mm$dd$j % 11)) -eq 0 ]]
+	    then
+		    echo "br: $rr$mm$dd/$j"
+	    fi
     done
 }
 
 function check_count_of_arguments()
 {
-    if [[ $1 -eq $2 ]]
-    then
-        return 0
-    else
-        echo "ERROR::Arguments should be equal to $2. (passing arguments: $1)"
-        return 1
-    fi
+	if [[ $1 -eq $2 ]]
+	then
+		return 0
+	else
+		echo "ERROR::Arguments should be equal to $2. (passing arguments: $1)"
+		return 1
+	fi
 }
 
-
+function check_gender()
+{
+	gender=$4
+	if [[ $gender == "M" ]] || [[ $gender == "Z" ]]
+	then
+		return 0
+	else
+		echo "ERROR::Please choose as gender either M, or Z. (getting: $gender)"
+		return 1
+	fi
+}
 
 check_count_of_arguments "$#" 4
-correct_count_of_arguments=$?
-if [[ $correct_count_of_arguments -eq 0 ]]
+count_of_arguments=$?
+
+check_gender "$@"
+gender=$?
+
+if [[ $count_of_arguments -eq 0 ]] && [[ $gender -eq 0 ]]
 then
-    main "$@"
+	main "$@"
 else
-    #echo "ERROR::"
-    :
+	#echo "ERROR::"
+	:
 fi

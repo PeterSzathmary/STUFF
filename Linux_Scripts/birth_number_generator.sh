@@ -17,9 +17,17 @@ function main()
 
     # Day
     dd=$1
+    if [[ $1 -lt 10 ]]
+    then
+        dd="0$dd"
+    fi
 
     # Month
     mm=$2
+    if [[ $2 -lt 10 ]]
+    then
+        mm="0$mm"
+    fi
 
     rr=$3
     # Get last two digits from the year.
@@ -46,7 +54,8 @@ function main()
     do
         if [[ $stop -eq 0 ]]
         then
-            break
+            #break
+            :
         fi
 
         br="$rr$mm$dd$j"
@@ -58,7 +67,8 @@ function main()
             then
                 i=$i+1
             else
-                stop=0
+                #stop=0
+                :
             fi
         fi
     done
@@ -107,11 +117,36 @@ function is_in_between()
     fi
 }
 
+function digits_only()
+{
+    re='^[0-9]+$'
+    if [[ $1 =~ $re ]]
+    then
+        return 0
+    else
+        echo "ERROR::Argument $1 should contain only digits!"
+        return 1
+    fi
+}
+
 function check_arguments()
 {
     check_count_of_arguments "$#" 4
     if [[ $? -eq 0 ]]
     then
+        # Store all arguments except last into the array.
+        arr=(${@:1:$#-1})
+        for ((i=0; i<${#arr[@]}; i++))
+        do
+            #echo "i: $i"
+            #echo "arr[$i]: ${arr[$i]}"
+            digits_only ${arr[$i]}
+            if [[ $? -eq 1 ]]
+            then
+                return 1
+            fi
+        done
+
         #is_in_between $(sed 's/^0*//' <<< $1) 1 31
         is_in_between $1 1 31
         d=$?

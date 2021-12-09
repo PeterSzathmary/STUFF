@@ -1,0 +1,12 @@
+08-Dec-2021 16:55:43.349 [ERROR] Coverage check is not yet ready.
+08-Dec-2021 16:55:43.349 [DEBUG] Raw value from 4g layer: 234 (240)
+08-Dec-2021 16:55:43.349 [DEBUG] Raw value from 5g layer: 550 (550)
+08-Dec-2021 16:55:43-349 [DEBUG] Raw value from status layer: 1 (1)
+08-Dec-2021 16:55:43.349 [DEBUG] Raw value from statfiveg layer: 1 (1)
+08-Dec-2021 16:55:43.349 [DEBUG] Values from test data (3G, 4G, Tech, 5G, Environment): 0.0, 16.0, 16.0, 0.0, 2.0
+08-Dec-2021 16:55:43.349 [INFO] 342e46715ed14dca850e442f5b4fed55: End of request
+08-Dec_2021 16:56:24.863 [INFO] Using layer  3G: TestData_3G_10KBitEncoded.asc - 03.08.2016 10:53
+08-Dec-2021 16:56:24.863 [INFO] e437c0dd4da04f0c8f6f302f4a3a3e53: Start of request
+08-Dec-2021 16:56:24.863 [DEBUG] e437c0dd4da04f0c8f6f302f4a3a3e53: testData enabled. Try to read.
+08-Dec-2021 16:56:24.863 [DEBUG] /pkg/moip/mo10211/hzgc/database/TestData.csv
+08-Dec-2021 16:56:24.863 DEBUG e437c0dd4da04f0c8f6f302f4a3a3e53: exact address found in TestData.

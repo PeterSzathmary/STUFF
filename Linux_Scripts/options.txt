@@ -12,3 +12,4 @@ mariadb_install
 php_install
 wordpress_install
 ftp_install
+cassandra_install

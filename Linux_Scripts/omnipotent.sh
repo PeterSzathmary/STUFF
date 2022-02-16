@@ -485,13 +485,47 @@ function all_install()
     awesome_vim
     ohmyzsh_setup
     nodejs_install
-    #gcc_install
+    gcc_install
     miniconda_install
     apache_install
     mariadb_install
     php_install
     wordpress_install
     ftp_install
+}
+
+function cassandra_install()
+{
+	if [ ! -f /cassandra_installed ]
+		echo "Installing cassandra..."
+		# Update the system.
+		update_system
+
+		# If Java is not installed, install it.
+		if [ ! -f /java_installed ]
+		then
+			java_install
+		fi
+	
+		# Add cassandra repo to yum repos directory.
+		sudo cp ./cassandra.repo /etc/yum.repos.d/
+
+		# Update the system again.
+		update_system
+
+		yum install cassandra -y
+
+		service cassandra start
+		chkconfig cassandra on
+
+		local file=/etc/cassandra/default.conf/cassandra-env.sh
+
+		sed -i 's/# JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=<public name>"/JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=127.0.0.1"/g' $file
+
+		sudo touch /cassandra_installed
+	else
+		echo "Cassandra already installed."
+	fi
 }
 
 main

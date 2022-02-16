@@ -497,6 +497,7 @@ function all_install()
 function cassandra_install()
 {
 	if [ ! -f /cassandra_installed ]
+	then
 		echo "Installing cassandra..."
 		# Update the system.
 		update_system
@@ -517,10 +518,6 @@ function cassandra_install()
 
 		service cassandra start
 		chkconfig cassandra on
-
-		local file=/etc/cassandra/default.conf/cassandra-env.sh
-
-		sed -i 's/# JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=<public name>"/JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=127.0.0.1"/g' $file
 
 		sudo touch /cassandra_installed
 	else

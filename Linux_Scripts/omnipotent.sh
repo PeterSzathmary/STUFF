@@ -106,8 +106,8 @@ function gui_install()
 function basic_install()
 {
     # Install some packages.
-	sudo yum install git epel-release zsh tree xterm wget vim-enhanced -y
-	sudo yum install fortune-mod cowsay most -y
+    sudo yum install git epel-release zsh tree xterm wget vim-enhanced -y
+    sudo yum install fortune-mod cowsay most -y
 }
 
 function java_install()
@@ -278,7 +278,7 @@ function miniconda_install()
         wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
         sh Miniconda3-latest-Linux-x86_64.sh -b
         cd ~/miniconda3/bin && ./conda update conda -y && ./conda update --all -y && ./conda init zsh
-        
+
         sudo touch /miniconda_installed
     else
         echo -e "${yellow}Miniconda is already installed...${no_color}"
@@ -437,7 +437,7 @@ function ftp_install()
         sudo firewall-cmd --zone=public --permanent --add-port=21/tcp
         sudo firewall-cmd --zone=public --permanent --add-service=ftp
         sudo firewall-cmd --reload
-        
+
         local dir=/etc/vsftpd/vsftpd.conf
 
         # Configuring VSFTPD.
@@ -469,10 +469,39 @@ function ftp_install()
         echo -e "\n${yellow}See this: https://www.johnyoung.tech/is-it-the-end-for-ftp/${no_color}"
         echo "Applying full access for ftpd to the system..."
         sudo setsebool -P ftpd_full_access on
-        
+
         sudo touch /ftp_installed
     else
         echo -e "${yellow}VSFTPD (ftp) is already installed...${no_color}"
+    fi
+}
+
+function docker_install()
+{
+    if [ ! -f /docker_installed  ]
+    then
+        sudo yum install -y yum-utils
+        sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        sudo yum install docker-ce docker-ce-cli containerd.io
+        sudo systemctl enable docker
+        sudo systemctl start docker
+        sudo groupadd docker
+
+        for homedir in /home/*
+        do
+            # Get username from string /home/<username>
+            # We want to work with $homedir string, so send it as input to sed.
+            # example: /home/testuser -> testuser
+            user=$(sed 's/\/home\///' <<< $homedir)
+
+            usermod -aG docker $user
+        done
+
+        newgrp docker
+
+        sudo touch /docker_installed
+    else
+        echo -e "${yellow}DOCKER is already installed...${no_color}"
     fi
 }
 
@@ -492,37 +521,38 @@ function all_install()
     php_install
     wordpress_install
     ftp_install
+    cassandra_install
 }
 
 function cassandra_install()
 {
-	if [ ! -f /cassandra_installed ]
-	then
-		echo "Installing cassandra..."
-		# Update the system.
-		update_system
+    if [ ! -f /cassandra_installed ]
+    then
+        echo "Installing cassandra..."
+        # Update the system.
+        update_system
 
-		# If Java is not installed, install it.
-		if [ ! -f /java_installed ]
-		then
-			java_install
-		fi
-	
-		# Add cassandra repo to yum repos directory.
-		sudo cp ./cassandra.repo /etc/yum.repos.d/
+        # If Java is not installed, install it.
+        if [ ! -f /java_installed ]
+        then
+            java_install
+        fi
 
-		# Update the system again.
-		update_system
+        # Add cassandra repo to yum repos directory.
+        sudo cp ./cassandra.repo /etc/yum.repos.d/
 
-		yum install cassandra -y
+        # Update the system again.
+        update_system
 
-		service cassandra start
-		chkconfig cassandra on
+        yum install cassandra -y
 
-		sudo touch /cassandra_installed
-	else
-		echo "Cassandra already installed."
-	fi
+        service cassandra start
+        chkconfig cassandra on
+
+        sudo touch /cassandra_installed
+    else
+        echo "Cassandra already installed."
+    fi
 }
 
 main

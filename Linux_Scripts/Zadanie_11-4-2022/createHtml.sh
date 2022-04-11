@@ -12,7 +12,7 @@ memory="${used_memory} ${free_memory}"
 os_release="$(cat /etc/os-release | grep PRETTY | tr -d '"' | sed 's/PRETTY_NAME=//g')"
 kernel="$(uname -rs)"
 
-cat > ex-1.html << EOF
+cat > index.html << EOF
         <html>
                 <head>
                         <title>$hostname</title>

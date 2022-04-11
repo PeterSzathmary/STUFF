@@ -482,7 +482,7 @@ function docker_install()
     then
         sudo yum install -y yum-utils
         sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-        sudo yum install docker-ce docker-ce-cli containerd.io
+        sudo yum install docker-ce docker-ce-cli containerd.io -y
         sudo systemctl enable docker
         sudo systemctl start docker
         sudo groupadd docker
@@ -497,7 +497,7 @@ function docker_install()
             usermod -aG docker $user
         done
 
-        newgrp docker
+        #newgrp docker
 
         sudo touch /docker_installed
     else

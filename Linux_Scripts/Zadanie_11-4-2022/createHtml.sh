@@ -13,32 +13,32 @@ os_release="$(cat /etc/os-release | grep PRETTY | tr -d '"' | sed 's/PRETTY_NAME
 kernel="$(uname -rs)"
 
 cat > index.html << EOF
-        <html>
-                <head>
-                        <title>$hostname</title>
-                </head>
-                <body style="background-color: powderblue;">
-                        <h1>Welcome to $hostname Info Page</h1>
-                        <hr>
-                        <b>This VM is administrated by:</b><br> $name
-                        <p><b>You can contact the admin via:</b> $email</p>
-                        <br>
+<html>
+        <head>
+                <title>$hostname</title>
+        </head>
+        <body style="background-color: powderblue;">
+                <h1>Welcome to $hostname Info Page</h1>
+                <hr>
+                <b>This VM is administrated by:</b><br> $name
+                <p><b>You can contact the admin via:</b> $email</p>
+                <br>
 
-                        <p><i>Server info:</i></p>
-                        <table border="1">
-                                <tr>
-                                        <td><b>CPU</b></td>
-                                        <td><b>Memory</b></td>
-                                        <td><b>OSRelease</b></td>
-                                        <td><b>Kernel</b></td>
-                                </tr>
-                                <tr>
-                                        <td>$cpu</td>
-                                        <td>$memory</td>
-                                        <td>$os_release</td>
-                                        <td>$kernel</td>
-                                </tr>
-                        </table>
-                </body>
-        </html>
+                <p><i>Server info:</i></p>
+                <table border="1">
+                        <tr>
+                                <td><b>CPU</b></td>
+                                <td><b>Memory</b></td>
+                                <td><b>OSRelease</b></td>
+                                <td><b>Kernel</b></td>
+                        </tr>
+                        <tr>
+                                <td>$cpu</td>
+                                <td>$memory</td>
+                                <td>$os_release</td>
+                                <td>$kernel</td>
+                        </tr>
+                </table>
+        </body>
+</html>
 EOF

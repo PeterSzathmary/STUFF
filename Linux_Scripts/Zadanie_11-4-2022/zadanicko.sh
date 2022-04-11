@@ -28,7 +28,7 @@ else
 
     mkfs.xfs /dev/data/docker
 
-    mkdir /var/lib/docker
+    #mkdir /var/lib/docker
 
     docker_uuid=$(blkid -s UUID -o value /dev/mapper/data-docker)
 

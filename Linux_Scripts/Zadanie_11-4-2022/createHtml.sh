@@ -1,6 +1,6 @@
 #!/bin/bash
 
-name="Peter Szathmáry"
+name="Peter Szathmary"
 email="peter.szathmary@t-systems.com"
 hostname=$(hostname)
 cpu=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')

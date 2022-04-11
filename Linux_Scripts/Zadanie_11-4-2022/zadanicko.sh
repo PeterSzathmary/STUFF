@@ -45,7 +45,7 @@ else
         echo "DISKS ALREADY FORMATTED"
     fi
 
-    if [ -f ./zadanie_hotove ]
+    if [ ! -f ./zadanie_hotove ]
     then
         ./createHtml.sh
         ./createDockerfile.sh
